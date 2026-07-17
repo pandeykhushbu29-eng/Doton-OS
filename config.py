@@ -1,5 +1,5 @@
 """
-firstAS (Ancoated System) avyaan v0.1 — Central configuration module.
+Central configuration module.
 
 All magic constants, paths, and tunables are defined here.
 Import via:  from config import *

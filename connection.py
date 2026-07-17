@@ -145,7 +145,7 @@ def _write_manifest(gexel: list[str], denel: list[str]) -> None:
     """
     try:
         with open(BUS_MANIFEST_PATH, "w", encoding="utf-8") as fh:
-            fh.write(f"firstAS avyaan v0.1 — BUS MANIFEST\n")
+            fh.write(f"BUS MANIFEST\n")
             fh.write(f"generated={time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n")
             fh.write(f"gexel_count={len(gexel)}\n")
             fh.write(f"denel_count={len(denel)}\n\n")

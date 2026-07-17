@@ -183,7 +183,7 @@ def disengage_freeze_rail() -> bool:
 #  ASLLL PARSER — STRUCTURE IS PERMANENTLY LOCKED
 # ---------------------------------------------------------------------------
 
-_ASLLL_PATTERN = re.compile(r"^:STP-(\d+)\.\.(.+?)\.\.\!$")
+_ASLLL_PATTERN = re.compile(r"^:STP-(\d+)\.\.(. +?)\.\.\!$")
 
 
 def _parse_aslll(command_str: str) -> tuple[bool, int, str]:
@@ -311,23 +311,23 @@ def _cmd_report_platform() -> bool:
 # ── REGISTER BUILT-IN COMMANDS ───────────────────────────────────────────────
 
 COMMAND_REGISTRY: dict = {
-    ":STP-1..freeze background..!":   _cmd_freeze_background,
-    ":STP-2..thaw background..!":     _cmd_thaw_background,
-    ":STP-3..hide canvas..!":         _cmd_hide_canvas,
-    ":STP-4..show canvas..!":         _cmd_show_canvas,
-    ":STP-5..minimize canvas..!":     _cmd_minimize_canvas,
-    ":STP-6..report platform..!":     _cmd_report_platform,
+    ":STP-1..freeze background..!": _cmd_freeze_background,
+    ":STP-2..thaw background..!": _cmd_thaw_background,
+    ":STP-3..hide canvas..!": _cmd_hide_canvas,
+    ":STP-4..show canvas..!": _cmd_show_canvas,
+    ":STP-5..minimize canvas..!": _cmd_minimize_canvas,
+    ":STP-6..report platform..!": _cmd_report_platform,
     # ── ADD YOUR COMMANDS HERE ──────────────────────────────────────────────
     # ":STP-7..your command here..!": your_function,
 }
 
 COMMAND_REGISTRY_BY_BODY: dict = {
     "freeze background": _cmd_freeze_background,
-    "thaw background":   _cmd_thaw_background,
-    "hide canvas":       _cmd_hide_canvas,
-    "show canvas":       _cmd_show_canvas,
-    "minimize canvas":   _cmd_minimize_canvas,
-    "report platform":   _cmd_report_platform,
+    "thaw background": _cmd_thaw_background,
+    "hide canvas": _cmd_hide_canvas,
+    "show canvas": _cmd_show_canvas,
+    "minimize canvas": _cmd_minimize_canvas,
+    "report platform": _cmd_report_platform,
 }
 
 # ===========================================================================
@@ -344,7 +344,7 @@ def main() -> bool:
     try:
         separator = "=" * 66
         print(separator)
-        print("  firstAS v0.1 — DENEL SOFTWARE MASTER ONLINE")
+        print("  DENEL SOFTWARE MASTER ONLINE")
         print(f"  Host OS: {_HOST_OS} | Freeze Rail: {'SIGSTOP' if _IS_POSIX else 'NtSuspendProcess'}")
         print(separator)
 
@@ -355,8 +355,8 @@ def main() -> bool:
 
         results = run_aslll_program(boot_commands)
 
-        passed  = sum(1 for v in results.values() if v is True)
-        failed  = sum(1 for v in results.values() if v is False)
+        passed = sum(1 for v in results.values() if v is True)
+        failed = sum(1 for v in results.values() if v is False)
         invalid = sum(1 for v in results.values() if v is None)
 
         print(f"\n  [DENEL] Boot ASLLL program complete:")
