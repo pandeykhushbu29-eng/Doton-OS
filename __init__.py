@@ -1,5 +1,5 @@
 """
-firstAS (Ancoated System) avyaan v0.1 — Linkloader Package
+Linkloader Package
 
 Boot-stage orchestrator that manages RDI token verification,
 system bus wiring, and master plane dispatch.
