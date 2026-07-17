@@ -1,0 +1,109 @@
+# Doton-OS
+
+> **An open operating system ecosystem for anyone.**
+
+Doton-OS is an open operating system ecosystem consisting of the
+**Doton Microkernel**, **Doublers Instruction Set Architecture (ISA)**,
+**LinkLoader Runtime Manager**, **Deshell (DSH)**, and the **Deson
+Compiler Specification**.
+
+Its purpose is not to replace existing operating systems, but to provide
+an independent operating system ecosystem with its own specifications
+that anyone may study, implement, improve, and build upon.
+
+---
+
+# Components
+
+- 🖥️ Doton Microkernel
+- ⚙️ Doublers ISA
+- 🔗 LinkLoader
+- 💻 Deshell (DSH)
+- 🛠️ Deson Compiler
+- 📜 Doton-OS Package License (DPL)
+
+---
+
+# Goals
+
+- Create an independent operating system ecosystem.
+- Encourage compatible operating system implementations.
+- Preserve long-term specification compatibility.
+- Allow the community to improve the specifications while preserving
+  their original meaning.
+- Provide an open ecosystem for learning, research, and development.
+
+---
+
+# Community
+
+Anyone may:
+
+- Read the specifications.
+- Study the operating system ecosystem.
+- Build compatible kernels.
+- Build compatible software.
+- Improve the official specifications while preserving their original
+  architectural meaning.
+- Create compatible extensions.
+
+See the **Doton-OS Package License (DPL)** for complete licensing terms.
+
+---
+
+# Compatibility
+
+Any implementation claiming compatibility with the official Doton-OS
+ecosystem shall preserve the behavior defined by the official
+specifications.
+
+Community improvements to the documentation are encouraged, provided
+they do not change the meaning or compatibility of the specifications.
+
+---
+
+# Related Projects
+
+### 📊 DULO
+
+An open spreadsheet engine specification.
+
+https://github.com/pandeykhushbu29-eng/DULO
+
+---
+
+### 🌿 Dob-VCS
+
+A lightweight version control system specification.
+
+https://github.com/pandeykhushbu29-eng/Dob-VCS
+
+---
+
+# Project History
+
+The first public version of the Doton-OS ecosystem was created by
+**Avyaan Mishra** (also known as **Doub.creator_00001**) in **2026**,
+when the author was **11 years old**.
+
+---
+
+> [!NOTE]
+> If you're reading this years from now—thank you.
+>
+> I created the first version of Doton-OS when I was 11 years old.
+> As I grow older, life may become busy, and I might not always be
+> able to actively work on the project.
+>
+> If that happens, I hope the community continues to improve
+> Doton-OS while preserving its compatibility and original vision.
+>
+> I'll do my best to return whenever I can.
+>
+> — Avyaan Mishra (Doub.creator_00001)
+
+---
+
+© 2026 Avyaan Mishra
+
+Released under the **Doton-OS Package License (DPL) v1.0**

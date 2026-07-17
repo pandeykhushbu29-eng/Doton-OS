@@ -1,0 +1,28 @@
+#[derive(Debug)]
+
+pub struct Command {
+    pub name: String,
+    pub args: Vec<String>,
+}
+
+pub fn parse(line: &str) -> Command {
+
+    let parts: Vec<String> =
+        line.split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
+
+    if parts.is_empty() {
+        return Command {
+            name: String::new(),
+            args: vec![],
+        };
+    }
+
+    Command {
+
+        name: parts[0].clone(),
+
+        args: parts[1..].to_vec(),
+    }
+}

@@ -1,0 +1,13 @@
+[package]
+
+name = "deshell"
+
+version = "0.1.0"
+
+edition = "2024"
+
+authors = ["Avyaan Mishra"]
+
+description = "Reference implementation of the DSH Specification."
+
+license = "DCA"

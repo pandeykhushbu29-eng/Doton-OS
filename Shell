@@ -1,0 +1,35 @@
+use std::io::{self, Write};
+
+use crate::commands;
+use crate::parser;
+
+pub struct Shell {
+    running: bool,
+}
+
+impl Shell {
+    pub fn new() -> Self {
+        Self {
+            running: true,
+        }
+    }
+
+    pub fn run(&mut self) {
+        while self.running {
+            print!("DSH> ");
+            io::stdout().flush().unwrap();
+
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+
+            let command = parser::parse(input.trim());
+
+            if command.name == "exit" {
+                self.running = false;
+                continue;
+            }
+
+            commands::execute(command);
+        }
+    }
+}

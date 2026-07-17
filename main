@@ -1,0 +1,17 @@
+mod shell;
+mod parser;
+mod commands;
+mod variables;
+mod script;
+mod errors;
+
+use shell::Shell;
+
+fn main() {
+    println!("Deshell Reference Implementation");
+    println!("DSH Specification v0.1");
+    println!("Type 'help' for commands.\n");
+
+    let mut shell = Shell::new();
+    shell.run();
+}

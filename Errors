@@ -1,0 +1,18 @@
+#[derive(Debug)]
+
+pub enum ShellError {
+
+    InvalidSyntax,
+
+    CommandNotFound,
+
+    InvalidArgument,
+
+    FileNotFound,
+
+    PermissionDenied,
+
+    RuntimeError,
+
+    InternalError,
+}

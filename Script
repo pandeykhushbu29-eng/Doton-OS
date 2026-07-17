@@ -1,0 +1,18 @@
+use std::fs;
+
+pub fn execute_script(path: &str) {
+
+    let text = fs::read_to_string(path)
+        .expect("Unable to open script.");
+
+    for line in text.lines() {
+
+        println!("Executing: {}", line);
+
+        // Future:
+        // Parse
+
+        // Execute
+
+    }
+}

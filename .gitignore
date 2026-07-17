@@ -1,0 +1,4 @@
+# Ignore python bytecode compilation folders
+__pycache__/
+*.py[cod]
+*$py.class

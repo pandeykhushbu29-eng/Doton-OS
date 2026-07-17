@@ -1,0 +1,1925 @@
+# LINKLOADER Specification
+
+Version 0.1 Draft
+
+Status:
+Draft
+
+Created By:
+Avyaan Mishra
+
+Document Name:
+LINKLOADER-SPEC
+
+Target Platform:
+Doton-OS
+
+---
+
+# Part I
+# Foundation
+
+# Chapter 1
+# Goals
+
+## 1.1 Purpose
+
+The LinkLoader Specification defines the observable behavior of a
+runtime service authority manager positioned between kernel
+initialization and userspace execution.
+
+LinkLoader is responsible for controlling service activation,
+dependency management, authority delegation, and runtime startup
+coordination.
+
+This specification defines observable behavior only.
+
+Internal implementation is unrestricted.
+
+---
+
+## 1.2 Objectives
+
+A conforming implementation SHALL
+
+• Register services.
+
+• Validate manifests.
+
+• Resolve dependencies.
+
+• Grant runtime authority.
+
+• Activate services.
+
+• Track service state.
+
+• Report diagnostics.
+
+• Support deterministic startup.
+
+---
+
+## 1.3 Scope
+
+This specification defines
+
+• Runtime startup
+
+• Service registration
+
+• Authority management
+
+• Dependency graphs
+
+• Runtime activation
+
+• Runtime shutdown
+
+• Manifest format
+
+• Service monitoring
+
+This specification does NOT define
+
+• CPU scheduling
+
+• Memory allocation
+
+• Filesystems
+
+• Device drivers
+
+• Interrupt handling
+
+• Process scheduling
+
+These remain responsibilities of the operating system.
+
+---
+
+## 1.4 Design Philosophy
+
+LinkLoader follows six principles.
+
+1.
+
+Kernel remains minimal.
+
+2.
+
+Authority is centralized.
+
+3.
+
+Services start only when required.
+
+4.
+
+Dependencies are explicit.
+
+5.
+
+Startup is deterministic.
+
+6.
+
+Implementation remains unrestricted.
+
+---
+
+## 1.5 Terminology
+
+Authority
+
+Permission granted to execute.
+
+Service
+
+A managed userspace component.
+
+Manifest
+
+A service description file.
+
+Dependency
+
+Another service required before startup.
+
+Activation
+
+Granting execution authority.
+
+Registry
+
+The collection of known services.
+
+---
+
+## 1.6 Runtime Position
+
+The conceptual startup model is
+
+Firmware
+
+↓
+
+Bootloader
+
+↓
+
+Kernel
+
+↓
+
+LinkLoader
+
+↓
+
+Boot Services
+
+↓
+
+Runtime Services
+
+↓
+
+Shell / GUI
+
+↓
+
+Applications
+
+---
+
+# Chapter 2
+# Architecture
+
+## 2.1 General
+
+LinkLoader SHALL execute immediately after kernel initialization.
+
+The kernel SHALL transfer startup control to LinkLoader.
+
+---
+
+## 2.2 Responsibilities
+
+LinkLoader SHALL
+
+• Discover manifests
+
+• Build dependency graphs
+
+• Validate startup order
+
+• Grant authority
+
+• Start services
+
+• Record service state
+
+• Accept runtime activation requests
+
+---
+
+## 2.3 Authority Model
+
+No managed service SHALL begin execution until authority has been
+granted.
+
+Authority SHALL be granted by LinkLoader.
+
+Example
+
+Application
+
+↓
+
+Activation Request
+
+↓
+
+LinkLoader
+
+↓
+
+Validation
+
+↓
+
+Authority Granted
+
+↓
+
+Service Starts
+
+---
+
+## 2.4 Runtime Lifetime
+
+LinkLoader SHALL remain resident after boot.
+
+It SHALL continue accepting activation requests until system shutdown.
+
+---
+
+## 2.5 Internal Design
+
+Implementations MAY use
+
+• Tables
+
+• Graphs
+
+• Trees
+
+• Databases
+
+• Hash Maps
+
+Observable behavior SHALL remain equivalent.
+
+---
+
+## 2.6 Thread Safety
+
+Concurrent activation requests SHOULD be handled safely.
+
+Race conditions SHALL NOT produce duplicate service execution.
+
+---
+
+## 2.7 Startup Determinism
+
+Given identical manifests,
+
+startup ordering SHALL remain deterministic.
+
+---
+
+# Chapter 3
+# Service Registry
+
+## 3.1 General
+
+Every managed service SHALL be registered.
+
+Unregistered services SHALL NOT receive runtime authority.
+
+---
+
+## 3.2 Service Identifier
+
+Every service SHALL contain
+
+• Name
+
+• Unique Identifier
+
+• Executable
+
+• Version
+
+Identifiers SHALL be unique.
+
+---
+
+## 3.3 Manifest
+
+Every service SHALL provide a manifest.
+
+Required fields
+
+Service Name
+
+Identifier
+
+Executable
+
+Startup Mode
+
+Permissions
+
+Dependencies
+
+Restart Policy
+
+Version
+
+Optional fields MAY be added.
+
+---
+
+## 3.4 Manifest Validation
+
+Invalid manifests SHALL be rejected.
+
+Examples include
+
+Missing executable
+
+Duplicate identifier
+
+Circular dependency
+
+Invalid startup mode
+
+---
+
+## 3.5 Registry Database
+
+The registry SHALL contain
+
+• Service Metadata
+
+• Runtime State
+
+• Dependencies
+
+• Authority Status
+
+• Failure Count
+
+Implementations MAY store additional metadata.
+
+---
+
+## 3.6 Registry Updates
+
+Registries MAY support
+
+Dynamic registration
+
+Dynamic removal
+
+Version updates
+
+Reloading
+
+---
+
+## 3.7 Compatibility
+
+Unknown manifest fields SHOULD be ignored whenever practical.
+
+Implementations SHALL preserve compatibility with previous manifest
+versions whenever possible.
+
+# Part II
+# Runtime
+
+# Chapter 4
+# Dependency Resolution
+
+## 4.1 General
+
+LinkLoader SHALL resolve service dependencies before granting runtime
+authority.
+
+Services SHALL NOT execute until all mandatory dependencies have entered
+the Running state.
+
+---
+
+## 4.2 Dependency Graph
+
+The runtime SHALL internally construct a dependency graph.
+
+Example
+
+Filesystem
+
+↓
+
+Logger
+
+↓
+
+Network
+
+↓
+
+Desktop
+
+↓
+
+Deshell
+
+The internal representation is implementation-defined.
+
+---
+
+## 4.3 Dependency Types
+
+A dependency MAY be
+
+• Required
+
+• Optional
+
+• Runtime
+
+• Boot
+
+Required dependencies SHALL be satisfied before startup.
+
+Optional dependencies MAY be skipped.
+
+---
+
+## 4.4 Circular Dependencies
+
+Circular dependency graphs SHALL be rejected.
+
+Example
+
+A → B
+
+B → C
+
+C → A
+
+The runtime SHALL report a diagnostic.
+
+---
+
+## 4.5 Missing Dependencies
+
+If a required dependency cannot be located,
+
+the requesting service SHALL NOT receive authority.
+
+---
+
+## 4.6 Version Compatibility
+
+Services MAY specify
+
+Minimum Version
+
+Maximum Version
+
+Preferred Version
+
+Implementations SHOULD validate compatibility.
+
+---
+
+## 4.7 Dependency Cache
+
+Implementations MAY cache dependency graphs.
+
+Cached graphs SHALL be invalidated whenever manifests change.
+
+---
+
+## 4.8 Dependency Diagnostics
+
+Diagnostics SHOULD identify
+
+• Missing dependency
+
+• Circular dependency
+
+• Version mismatch
+
+• Invalid manifest
+
+---
+
+## 4.9 Summary
+
+Dependency resolution SHALL complete before runtime authority is granted.
+
+---
+
+# Chapter 5
+# Startup Pipeline
+
+## 5.1 General
+
+Startup SHALL occur in deterministic phases.
+
+Each phase SHALL complete before the next begins.
+
+---
+
+## 5.2 Phase One
+
+Registry Initialization
+
+• Discover manifests
+
+• Validate manifests
+
+• Build registry
+
+---
+
+## 5.3 Phase Two
+
+Dependency Resolution
+
+• Build dependency graph
+
+• Validate graph
+
+• Reject invalid services
+
+---
+
+## 5.4 Phase Three
+
+Authority Assignment
+
+LinkLoader SHALL determine which services are eligible to execute.
+
+---
+
+## 5.5 Phase Four
+
+Boot Services
+
+Mandatory boot services SHALL start first.
+
+Examples
+
+Storage
+
+Logging
+
+Console
+
+IPC
+
+---
+
+## 5.6 Phase Five
+
+Runtime Services
+
+Automatic runtime services SHALL start.
+
+Manual services SHALL remain inactive.
+
+---
+
+## 5.7 Phase Six
+
+User Environment
+
+Shell
+
+GUI
+
+Desktop
+
+Login Manager
+
+Applications
+
+MAY begin execution.
+
+---
+
+## 5.8 Startup Completion
+
+Startup SHALL be considered complete when every required service reaches
+
+Running
+
+or
+
+Failed.
+
+---
+
+## 5.9 Startup Logging
+
+Implementations SHOULD record
+
+Startup Time
+
+Service Count
+
+Failures
+
+Warnings
+
+---
+
+## 5.10 Summary
+
+The startup pipeline provides deterministic and repeatable system
+initialization.
+
+---
+
+# Chapter 6
+# Authority Management
+
+## 6.1 General
+
+Authority represents LinkLoader's permission for a managed service to
+begin execution.
+
+A managed service SHALL NOT execute without authority.
+
+---
+
+## 6.2 Authority Request
+
+A request MAY originate from
+
+• Boot
+
+• Another Service
+
+• User
+
+• Application
+
+• Administrator
+
+---
+
+## 6.3 Validation
+
+Before authority is granted,
+
+LinkLoader SHALL verify
+
+• Service registration
+
+• Manifest validity
+
+• Dependency satisfaction
+
+• Startup mode
+
+• Runtime state
+
+---
+
+## 6.4 Grant
+
+If validation succeeds,
+
+LinkLoader SHALL grant execution authority.
+
+The service MAY then start.
+
+---
+
+## 6.5 Denial
+
+Authority SHALL be denied if
+
+• Dependencies failed
+
+• Service is disabled
+
+• Manifest is invalid
+
+• Duplicate execution is detected
+
+---
+
+## 6.6 Revocation
+
+Implementations MAY revoke authority.
+
+Revocation SHOULD stop future activations.
+
+Running services MAY continue or terminate according to implementation
+policy.
+
+---
+
+## 6.7 Duplicate Authority
+
+A running service SHALL NOT receive duplicate authority.
+
+Repeated activation requests SHOULD return the existing service state.
+
+---
+
+## 6.8 Authority Lifetime
+
+Authority MAY remain valid
+
+• Until shutdown
+
+• Until service exit
+
+• For a defined duration
+
+Policy is implementation-defined.
+
+---
+
+## 6.9 Summary
+
+Authority management forms the security boundary between startup requests
+and service execution.
+
+# Chapter 7
+# Runtime Activation
+
+## 7.1 General
+
+After system startup, LinkLoader SHALL continue operating as the runtime
+authority manager.
+
+Services MAY be activated at any time.
+
+---
+
+## 7.2 Activation Sources
+
+Runtime activation MAY originate from
+
+• Applications
+
+• Shell
+
+• Desktop Environment
+
+• User Request
+
+• Another Service
+
+• Administrator
+
+---
+
+## 7.3 Activation Pipeline
+
+Every activation SHALL follow
+
+Request
+
+↓
+
+Validation
+
+↓
+
+Registry Lookup
+
+↓
+
+Dependency Check
+
+↓
+
+Authority Decision
+
+↓
+
+Execution
+
+↓
+
+State Update
+
+---
+
+## 7.4 Service Launch
+
+Upon successful validation,
+
+LinkLoader SHALL launch the requested executable.
+
+The executable path SHALL be obtained from the service manifest.
+
+---
+
+## 7.5 Duplicate Requests
+
+If a service is already running,
+
+LinkLoader SHALL NOT create another instance unless the manifest
+explicitly permits multiple instances.
+
+---
+
+## 7.6 Runtime Dependencies
+
+Services activated during runtime SHALL satisfy dependency
+requirements before execution.
+
+---
+
+## 7.7 Activation Queue
+
+Implementations MAY queue activation requests.
+
+Queued requests SHOULD be processed in arrival order.
+
+---
+
+## 7.8 Runtime Failures
+
+Activation failures SHALL generate diagnostics.
+
+Failed activations SHALL NOT affect unrelated services.
+
+---
+
+## 7.9 Summary
+
+Runtime activation extends LinkLoader functionality beyond system boot.
+
+---
+
+# Chapter 8
+# Service Monitoring
+
+## 8.1 General
+
+LinkLoader SHALL maintain runtime information for every managed service.
+
+---
+
+## 8.2 Runtime States
+
+Minimum states
+
+Registered
+
+Waiting
+
+Starting
+
+Running
+
+Paused
+
+Stopping
+
+Stopped
+
+Failed
+
+---
+
+## 8.3 State Changes
+
+State transitions SHALL be recorded.
+
+Implementations MAY expose runtime state through management APIs.
+
+---
+
+## 8.4 Health Monitoring
+
+Implementations MAY periodically verify
+
+• Process existence
+
+• Heartbeat
+
+• Response time
+
+• Exit status
+
+---
+
+## 8.5 Unexpected Termination
+
+Unexpected service termination SHALL update runtime state to
+
+Failed
+
+Restart behavior SHALL follow the configured restart policy.
+
+---
+
+## 8.6 Resource Information
+
+Implementations MAY collect
+
+CPU Usage
+
+Memory Usage
+
+Runtime Duration
+
+Restart Count
+
+Exit Code
+
+---
+
+## 8.7 Logging
+
+Service events SHOULD be logged.
+
+Examples
+
+Started
+
+Stopped
+
+Restarted
+
+Failed
+
+Authority Granted
+
+Authority Denied
+
+---
+
+## 8.8 Monitoring Interface
+
+Implementations MAY expose runtime information through
+
+• CLI
+
+• API
+
+• GUI
+
+---
+
+## 8.9 Summary
+
+Monitoring provides runtime visibility into managed services.
+
+---
+
+# Chapter 9
+# Runtime Messaging
+
+## 9.1 General
+
+LinkLoader MAY provide communication between managed services.
+
+---
+
+## 9.2 Message Types
+
+Supported message categories MAY include
+
+Activation
+
+Shutdown
+
+Reload
+
+Status
+
+Query
+
+Notification
+
+---
+
+## 9.3 Service Requests
+
+Managed services MAY request
+
+Start Service
+
+Stop Service
+
+Restart Service
+
+Query Status
+
+Request Authority
+
+---
+
+## 9.4 Authority Requests
+
+Authority requests SHALL be validated before execution.
+
+Unauthorized requests SHALL be rejected.
+
+---
+
+## 9.5 Notifications
+
+LinkLoader MAY notify dependent services when
+
+• a service starts
+
+• a service stops
+
+• a service fails
+
+• configuration changes
+
+---
+
+## 9.6 Reload
+
+Configuration reloads MAY occur without restarting LinkLoader.
+
+Services MAY receive reload notifications.
+
+---
+
+## 9.7 Shutdown Broadcast
+
+During system shutdown,
+
+LinkLoader SHOULD notify managed services before termination.
+
+---
+
+## 9.8 Message Reliability
+
+Implementations SHOULD guarantee ordered delivery for messages between
+LinkLoader and managed services whenever practical.
+
+---
+
+## 9.9 Summary
+
+Runtime messaging allows LinkLoader to coordinate managed services after
+system startup while remaining independent of kernel IPC mechanisms.
+
+# Part III
+# Configuration & Security
+
+# Chapter 10
+# Manifest Specification
+
+## 10.1 General
+
+Every managed service SHALL provide exactly one service manifest.
+
+The manifest describes the service and provides the information required
+by LinkLoader to determine startup behavior.
+
+---
+
+## 10.2 Required Fields
+
+Every manifest SHALL contain
+
+Service Name
+
+Identifier
+
+Version
+
+Executable
+
+Startup Mode
+
+Dependencies
+
+Authority Level
+
+Restart Policy
+
+---
+
+## 10.3 Optional Fields
+
+A manifest MAY additionally define
+
+Description
+
+Author
+
+Working Directory
+
+Arguments
+
+Environment Variables
+
+Timeout
+
+Priority
+
+Maximum Instances
+
+Custom Metadata
+
+---
+
+## 10.4 Startup Modes
+
+The following startup modes are standardized.
+
+Automatic
+
+Started during system startup.
+
+Manual
+
+Started only by explicit request.
+
+On-Demand
+
+Started when another service or application requests it.
+
+Disabled
+
+Never started.
+
+---
+
+## 10.5 Authority Level
+
+Every service SHALL declare its required authority.
+
+Examples include
+
+Normal
+
+System
+
+Privileged
+
+Kernel-Assisted
+
+Implementations MAY define additional authority classes.
+
+---
+
+## 10.6 Dependency Declaration
+
+Dependencies SHALL reference service identifiers.
+
+Example
+
+Filesystem
+
+↓
+
+Logger
+
+↓
+
+Network
+
+↓
+
+Desktop
+
+The dependency graph SHALL remain acyclic.
+
+---
+
+## 10.7 Manifest Validation
+
+LinkLoader SHALL reject manifests containing
+
+Duplicate identifiers
+
+Unknown startup modes
+
+Invalid authority levels
+
+Circular dependencies
+
+Missing executables
+
+---
+
+## 10.8 Manifest Versioning
+
+Every manifest SHALL contain a version.
+
+LinkLoader SHOULD support backward-compatible manifest revisions.
+
+---
+
+## 10.9 Manifest Compatibility
+
+Unknown optional fields SHOULD be ignored.
+
+Mandatory fields SHALL always be validated.
+
+---
+
+## 10.10 Summary
+
+The manifest is the canonical description of every managed service.
+
+---
+
+# Chapter 11
+# Security & Authority Policy
+
+## 11.1 General
+
+LinkLoader is responsible for controlling execution authority for
+managed services.
+
+Execution SHALL NOT begin without authorization.
+
+---
+
+## 11.2 Trust Boundary
+
+The trust boundary exists between
+
+Request
+
+↓
+
+Validation
+
+↓
+
+Authority Decision
+
+↓
+
+Execution
+
+Only validated services SHALL cross this boundary.
+
+---
+
+## 11.3 Authority Verification
+
+Before granting authority,
+
+LinkLoader SHALL verify
+
+• Registration
+
+• Manifest
+
+• Dependencies
+
+• Runtime State
+
+• Startup Policy
+
+---
+
+## 11.4 Unauthorized Services
+
+Unknown or unregistered services SHALL be denied authority.
+
+Diagnostics SHALL be generated.
+
+---
+
+## 11.5 Authority Revocation
+
+Authority MAY be revoked when
+
+A service becomes invalid
+
+A manifest changes
+
+A dependency fails
+
+Administrative action occurs
+
+---
+
+## 11.6 Privileged Services
+
+Privileged services SHOULD be started only after successful authority
+verification.
+
+Implementations MAY require additional validation.
+
+---
+
+## 11.7 Service Isolation
+
+Implementations SHOULD isolate managed services whenever practical.
+
+Isolation mechanisms are implementation-defined.
+
+---
+
+## 11.8 Runtime Verification
+
+Authority MAY be revalidated during runtime.
+
+Revalidation SHOULD NOT interrupt healthy services.
+
+---
+
+## 11.9 Security Diagnostics
+
+Typical diagnostics include
+
+Unknown Service
+
+Invalid Manifest
+
+Authority Denied
+
+Dependency Failure
+
+Policy Violation
+
+Duplicate Activation
+
+---
+
+## 11.10 Summary
+
+Authority management forms the primary security mechanism defined by this
+specification.
+
+---
+
+# Chapter 12
+# Logging & Diagnostics
+
+## 12.1 General
+
+LinkLoader SHOULD record significant runtime events.
+
+Logging assists debugging, monitoring, and compliance verification.
+
+---
+
+## 12.2 Logged Events
+
+Recommended events include
+
+System Startup
+
+Registry Loaded
+
+Service Started
+
+Service Stopped
+
+Service Failed
+
+Authority Granted
+
+Authority Denied
+
+Manifest Loaded
+
+Manifest Rejected
+
+---
+
+## 12.3 Log Levels
+
+Standard log levels
+
+Information
+
+Warning
+
+Error
+
+Critical
+
+Debug
+
+---
+
+## 12.4 Diagnostics
+
+Diagnostics SHALL contain
+
+Category
+
+Identifier
+
+Description
+
+Timestamp
+
+Service Identifier
+
+Severity
+
+---
+
+## 12.5 Standard Diagnostic Codes
+
+LL0001
+
+Manifest Missing
+
+LL0002
+
+Invalid Manifest
+
+LL0003
+
+Duplicate Identifier
+
+LL0004
+
+Circular Dependency
+
+LL0005
+
+Dependency Missing
+
+LL0006
+
+Authority Denied
+
+LL0007
+
+Service Failed
+
+LL0008
+
+Executable Missing
+
+LL0009
+
+Registry Failure
+
+LL0010
+
+Internal Error
+
+---
+
+## 12.6 Persistent Logging
+
+Implementations MAY retain logs across reboots.
+
+Storage mechanisms are implementation-defined.
+
+---
+
+## 12.7 Log Rotation
+
+Implementations SHOULD support log cleanup or rotation.
+
+---
+
+## 12.8 Compatibility
+
+Diagnostic wording MAY differ.
+
+Diagnostic meaning SHALL remain equivalent.
+
+---
+
+## 12.9 Summary
+
+Logging provides standardized runtime reporting for LinkLoader
+implementations.
+
+# Part IV
+# Conformance
+
+# Chapter 13
+# Conformance
+
+## 13.1 General
+
+An implementation SHALL satisfy every mandatory requirement defined by
+this specification before claiming compatibility.
+
+---
+
+## 13.2 Mandatory Features
+
+A conforming implementation SHALL implement
+
+✓ Service Registry
+
+✓ Manifest Validation
+
+✓ Dependency Resolution
+
+✓ Deterministic Startup
+
+✓ Runtime Activation
+
+✓ Authority Management
+
+✓ Service State Tracking
+
+✓ Diagnostics
+
+✓ Startup Pipeline
+
+---
+
+## 13.3 Optional Features
+
+Implementations MAY additionally support
+
+• Service Priorities
+
+• Plugins
+
+• Live Manifest Reload
+
+• Remote Management
+
+• GUI Tools
+
+• Monitoring APIs
+
+• Performance Statistics
+
+Optional functionality SHALL NOT modify mandatory behavior.
+
+---
+
+## 13.4 Compatibility Statement
+
+An implementation MAY advertise
+
+"LinkLoader Compatible"
+
+only after implementing every mandatory requirement defined by this
+specification.
+
+---
+
+## 13.5 Version Reporting
+
+Implementations SHOULD report
+
+Implementation Name
+
+Implementation Version
+
+Specification Version
+
+Target Platform
+
+Example
+
+LinkLoader
+
+Version 1.0
+
+Specification 0.1
+
+Target Doton-OS
+
+---
+
+## 13.6 Backwards Compatibility
+
+Future specification revisions SHOULD preserve compatibility whenever
+practical.
+
+Breaking changes SHALL require a major specification revision.
+
+---
+
+## 13.7 Observable Behavior
+
+Internal implementation MAY differ.
+
+Observable runtime behavior SHALL remain equivalent.
+
+---
+
+## 13.8 Summary
+
+Conformance ensures that independently developed implementations remain
+compatible.
+
+---
+
+# Chapter 14
+# Compliance Testing
+
+## 14.1 General
+
+Compliance testing verifies conformance with this specification.
+
+---
+
+## 14.2 Registry Tests
+
+Verify
+
+• Registration
+
+• Duplicate Detection
+
+• Manifest Loading
+
+---
+
+## 14.3 Dependency Tests
+
+Verify
+
+• Dependency Ordering
+
+• Missing Dependencies
+
+• Circular Dependency Detection
+
+---
+
+## 14.4 Startup Tests
+
+Verify
+
+• Automatic Startup
+
+• Manual Startup
+
+• On-Demand Startup
+
+• Startup Determinism
+
+---
+
+## 14.5 Authority Tests
+
+Verify
+
+• Authority Grant
+
+• Authority Denial
+
+• Duplicate Requests
+
+• Runtime Requests
+
+---
+
+## 14.6 Runtime Tests
+
+Verify
+
+• Service State Updates
+
+• Restart Policies
+
+• Shutdown Handling
+
+---
+
+## 14.7 Manifest Tests
+
+Verify
+
+• Required Fields
+
+• Optional Fields
+
+• Invalid Fields
+
+• Version Compatibility
+
+---
+
+## 14.8 Diagnostic Tests
+
+Verify
+
+• Standard Diagnostic Codes
+
+• Error Categories
+
+• Failure Reporting
+
+---
+
+## 14.9 Summary
+
+Passing compliance tests demonstrates conformance with the LinkLoader
+Specification.
+
+---
+
+# Appendix A
+# Manifest Reference
+
+Minimum Required Fields
+
+Name
+
+Identifier
+
+Version
+
+Executable
+
+StartupMode
+
+Authority
+
+Dependencies
+
+RestartPolicy
+
+Recommended Optional Fields
+
+Description
+
+Author
+
+WorkingDirectory
+
+Arguments
+
+Environment
+
+Priority
+
+Timeout
+
+MaximumInstances
+
+Metadata
+
+---
+
+# Appendix B
+# Runtime Service States
+
+Registered
+
+↓
+
+Validated
+
+↓
+
+Waiting
+
+↓
+
+Authority Granted
+
+↓
+
+Starting
+
+↓
+
+Running
+
+↓
+
+Stopping
+
+↓
+
+Stopped
+
+or
+
+↓
+
+Failed
+
+State transitions SHALL occur in the order required by this
+specification.
+
+---
+
+# Appendix C
+# Startup Sequence Example
+
+Firmware
+
+↓
+
+Bootloader
+
+↓
+
+Kernel
+
+↓
+
+LinkLoader
+
+↓
+
+Registry Initialization
+
+↓
+
+Manifest Discovery
+
+↓
+
+Manifest Validation
+
+↓
+
+Dependency Graph Construction
+
+↓
+
+Authority Assignment
+
+↓
+
+Boot Services
+
+↓
+
+Runtime Services
+
+↓
+
+Desktop or Deshell
+
+↓
+
+Applications
+
+↓
+
+Runtime Activation Requests
+
+↓
+
+System Shutdown
+
+---
+
+# Appendix D
+# Example Manifest
+
+ServiceName = "Network"
+
+Identifier = "network"
+
+Version = "1.0"
+
+Executable = "/system/services/networkd"
+
+StartupMode = Automatic
+
+Authority = System
+
+Dependencies =
+
+Filesystem
+
+Logger
+
+RestartPolicy = OnFailure
+
+Priority = Normal
+
+---
+
+END OF LINKLOADER SPECIFICATION
+
+Version 0.1 Draft
+
+Status: Draft
+
+Created By:
+Avyaan Mishra
+
+Target Platform:
+Doton-OS

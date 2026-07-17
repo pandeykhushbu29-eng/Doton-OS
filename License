@@ -1,0 +1,48 @@
+Doton-OS Package License (DPL)
+
+Version 1.0
+
+Copyright © 2026 Avyaan Mishra (Doub.creator_00001)
+
+Permission is hereby granted to any person to use, study, copy,
+implement, modify, and distribute the specifications, documentation,
+and reference implementations contained within this repository,
+subject to the following conditions.
+
+1. This repository primarily contains specifications and reference
+   implementations for the Doton-OS ecosystem.
+
+2. Anyone may create compatible or modified implementations using
+   any programming language, operating system, hardware platform,
+   or development tools.
+
+3. Redistributed copies of this repository SHALL retain this
+   license and copyright notice.
+
+4. Modified versions SHOULD clearly indicate that changes have
+   been made.
+
+5. Contributors retain copyright over their own original
+   contributions.
+
+6. This license applies only to the contents of this repository
+   and does not automatically apply to independent projects built
+   using these specifications.
+
+7. The names "Doton-OS", "Doton", "Doublers", "LinkLoader",
+   "Deshell", and "Deson" refer to the specifications contained
+   within this repository. Compatibility claims SHOULD accurately
+   reflect implementation status.
+
+THE SOFTWARE, SPECIFICATIONS, DOCUMENTATION, AND REFERENCE
+IMPLEMENTATIONS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM,
+DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT,
+OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OF THIS PROJECT.
+
+End of Doton-OS Package License

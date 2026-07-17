@@ -1,0 +1,36 @@
+use crate::parser::Command;
+
+pub fn execute(cmd: Command) {
+
+    match cmd.name.as_str() {
+
+        "print" => {
+
+            println!("{}", cmd.args.join(" "));
+        }
+
+        "help" => {
+
+            println!("Commands");
+
+            println!("print");
+
+            println!("help");
+
+            println!("exit");
+        }
+
+        "pwd" => {
+
+            println!(
+                "{}",
+                std::env::current_dir().unwrap().display()
+            );
+        }
+
+        _ => {
+
+            println!("Unknown command.");
+        }
+    }
+}

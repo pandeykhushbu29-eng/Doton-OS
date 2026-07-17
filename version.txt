@@ -1,0 +1,88 @@
+========================================
+DOTON-OS VERSION INFORMATION
+========================================
+
+Project Name
+Doton-OS
+
+Project Type
+Operating System Ecosystem Specification
+
+Version
+0.1 Draft
+
+Package Version
+0.1.0
+
+Specification Version
+0.1
+
+Release Status
+Draft
+
+Architecture
+Microkernel
+
+Instruction Set
+Doublers ISA
+
+Primary Components
+
+✓ Doton Microkernel
+✓ Doublers ISA
+✓ LinkLoader
+✓ Deshell (DSH)
+✓ Deson Compiler
+
+Repository Structure
+
+/Doton
+/Doublers
+/LinkLoader
+/Deshell
+/Deson
+
+License
+Doton-OS Package License (DPL) Version 1.0
+
+Compatibility
+Experimental
+
+Repository
+https://github.com/pandeykhushbu29-eng/Doton-OS
+
+Related Projects
+
+DULO
+https://github.com/pandeykhushbu29-eng/DULO
+
+Dob-VCS
+https://github.com/pandeykhushbu29-eng/Dob-VCS
+
+Created By
+Avyaan Mishra
+
+Creator ID
+Doub.creator_00001
+
+First Public Release
+2026
+
+Copyright
+Copyright © 2026 Avyaan Mishra (Doub.creator_00001)
+
+Last Updated
+2026
+
+Notes
+
+This repository is the official specification package for the
+Doton-OS ecosystem.
+
+It contains the official specifications for the Doton Microkernel,
+Doublers ISA, LinkLoader Runtime Manager, Deshell (DSH), and the
+Deson Compiler.
+
+========================================
+END OF VERSION FILE
+========================================
