@@ -1,9 +1,23 @@
+# Copyright (C) 2024 Avyaan Mishra
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
 """
 cleanup.py — Graceful shutdown and cleanup for the boot sequence.
 
 Registers atexit handlers that clean up temporary files,
-release resources, and ensure clean exit state.
-"""
+release resources, and ensure clean exit state."""
 
 import atexit
 import os
@@ -12,31 +26,17 @@ from pathlib import Path
 
 logger = logging.getLogger("cleanup")
 
-# Track registered resources for cleanup
-_registered_cleanups: list[tuple[str, str]] = []  # (path, description)
+_registered_cleanups: list[tuple[str, str]] = []
 
 
 def register_temp_file(path: str, description: str = "temporary file") -> None:
-    """
-    Register a temporary file for cleanup at exit.
-
-    Args:
-        path: Absolute path to the temporary file.
-        description: Human-readable description for logging.
-    """
     _registered_cleanups.append((path, description))
     logger.debug(f"Registered for cleanup: {description}  path={path}")
 
-
 def _cleanup_all() -> None:
-    """
-    Execute all registered cleanup actions.
-    Called automatically at interpreter exit via atexit.
-    """
     logger.info("Running cleanup handlers...")
     cleaned = 0
     errors = 0
-
     for path, description in _registered_cleanups:
         try:
             p = Path(path)
@@ -52,37 +52,25 @@ def _cleanup_all() -> None:
         except (OSError, PermissionError) as exc:
             logger.warning(f"Cleanup failed for {description}: {exc}")
             errors += 1
-
     if errors:
         logger.warning(f"Cleanup complete — {cleaned} cleaned, {errors} errors")
     else:
         logger.info(f"Cleanup complete — {cleaned} items cleaned")
 
-
 def register_bus_state_cleanup() -> None:
-    """
-    Register .bus_state and .bus_manifest for cleanup on exit.
-    Call during boot start to ensure clean state after shutdown.
-    """
     from config import BUS_STATE_PATH, BUS_MANIFEST_PATH
     bus_state_path = str(BUS_STATE_PATH)
     manifest_path = str(BUS_MANIFEST_PATH)
     register_temp_file(bus_state_path, "bus_state file")
     register_temp_file(manifest_path, "bus_manifest file")
 
-
 def register_mirror_cleanup() -> None:
-    """
-    Register .rdi_mirror for cleanup on exit.
-    """
     from config import TOKEN_MIRROR_PATH
     register_temp_file(str(TOKEN_MIRROR_PATH), "RDI token mirror")
 
 
-# Register the atexit handler
-atexit.register(_cleanup_all)
+vexit.register(_cleanup_all)
 
 if __name__ == "__main__":
-    # Test harness
     logging.basicConfig(level=logging.INFO)
-    print("Cleanup module loaded — atexit handlers registered.")
+    print("Cleanup module loaded — atexit andlers registered.")
